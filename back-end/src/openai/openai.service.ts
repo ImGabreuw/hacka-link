@@ -5,6 +5,11 @@ import {ImageProcessorService} from "../image-processor/image-processor.service"
 
 @Injectable()
 export class OpenaiService {
+    private readonly PROMPT = `Liste em itens os textos dos tópicos presentes na imagem. 
+Na resposta não deve conter:
+- Conteúdo que não esteja na imagem. 
+- Comentários adicionais, como obsevações e saudações.`
+
     private openai: OpenAI
 
     constructor(
@@ -21,7 +26,34 @@ export class OpenaiService {
             messages: [
                 {
                     role: "user",
-                    content: "Extraia os conteúdos da imagem.",
+                    content: this.PROMPT,
+                },
+                {
+                    role: "user",
+                    content: [
+                        {
+                            type: "image_url",
+                            image_url: {
+                                url: encodedImage,
+                                detail: "low"
+                            }
+                        }
+                    ]
+                }
+            ],
+            model: "gpt-4-vision-preview",
+        });
+
+        return chatCompletion.choices[0].message.content
+    }
+
+
+    async getEncodedImageContent(encodedImage: string): Promise<string> {
+        const chatCompletion = await this.openai.chat.completions.create({
+            messages: [
+                {
+                    role: "user",
+                    content: this.PROMPT,
                 },
                 {
                     role: "user",

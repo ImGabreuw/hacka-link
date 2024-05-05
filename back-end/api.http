@@ -1,0 +1,10 @@
+### Create User Profile
+POST http://localhost:3000/user-profile
+Content-Type: application/json
+
+{
+  "username": "Gabriel",
+  "learningMethod": "Aprendo vendo - Visual",
+  "contentStyleTitle": "Storytelling",
+  "contentStyleDescription": "Narração de histórias para transmitir uma mensagem, envolvendo personagens, enredo e emoções"
+}
