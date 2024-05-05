@@ -22,7 +22,8 @@ describe('UserProfileService', () => {
 
     it('should save user profile', async () => {
         const result = await service.create({
-            username: "Gabriel",
+            username: "Roberto",
+            age: 20,
             learningMethod: "Aprendo vendo - Visual",
             contentStyleTitle: "Storytelling",
             contentStyleDescription: "Narração de histórias para transmitir uma mensagem, envolvendo personagens, enredo e emoções",
@@ -33,9 +34,8 @@ describe('UserProfileService', () => {
     });
 
     it("should find user profile", async () => {
-        const result = await service.findByUsername("Roberto")
+        const result = await service.findByUsername("Gabriel")
 
-        console.log(result);
         expect(result).not.toBeNull();
     });
 })

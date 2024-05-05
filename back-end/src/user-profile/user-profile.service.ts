@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {CreateUserProfileDto} from './dto/create-user-profile.dto';
 
-import {addDoc, collection, getFirestore, Firestore, getDocs, query, where } from "firebase/firestore";
+import {addDoc, collection, Firestore, getDocs, query, where} from "firebase/firestore";
 import {UserProfile} from "./entities/user-profile.entity";
 
 @Injectable()
@@ -12,7 +12,7 @@ export class UserProfileService {
     ) {
     }
 
-    async create({username, learningMethod, contentStyleTitle, contentStyleDescription}: CreateUserProfileDto) {
+    async create({username, age, learningMethod, contentStyleTitle, contentStyleDescription}: CreateUserProfileDto) {
         const userProfile = await this.findByUsername(username);
 
         if (userProfile) {
@@ -23,6 +23,7 @@ export class UserProfileService {
             collection(this.firestore, "user_profiles"),
             {
                 username,
+                age,
                 learningMethod,
                 contentStyleTitle,
                 contentStyleDescription

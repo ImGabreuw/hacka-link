@@ -2,11 +2,12 @@ import {Module} from '@nestjs/common';
 import {OpenaiService} from './openai.service';
 import {ConfigService} from "@nestjs/config";
 import {ImageProcessorService} from "../image-processor/image-processor.service";
-import { OpenaiController } from './openai.controller';
+import {ContentService} from "../content/content.service";
+import {FirebaseModule} from "../firebase/firebase.module";
 
 @Module({
-    providers: [OpenaiService, ConfigService, ImageProcessorService],
-    controllers: [OpenaiController],
+    imports: [FirebaseModule],
+    providers: [OpenaiService, ConfigService, ImageProcessorService, ContentService],
 })
 export class OpenaiModule {
 }

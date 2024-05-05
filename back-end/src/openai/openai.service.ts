@@ -2,10 +2,11 @@ import {Injectable} from '@nestjs/common';
 import {ConfigService} from "@nestjs/config";
 import OpenAI from "openai";
 import {ImageProcessorService} from "../image-processor/image-processor.service";
+import {ContentService} from "../content/content.service";
 
 @Injectable()
 export class OpenaiService {
-    private readonly PROMPT = `Liste em itens os textos dos tópicos presentes na imagem. 
+    private static readonly EXTRACT_CONTENT_PROMPT = `Liste em itens os textos dos tópicos presentes na imagem. 
 Na resposta não deve conter:
 - Conteúdo que não esteja na imagem. 
 - Comentários adicionais, como obsevações e saudações.`
@@ -14,7 +15,8 @@ Na resposta não deve conter:
 
     constructor(
         private readonly configService: ConfigService,
-        private readonly imageProcessorService: ImageProcessorService
+        private readonly imageProcessorService: ImageProcessorService,
+        private readonly contentService: ContentService
     ) {
         const apiKey = configService.get<string>("OPENAI_API_KEY")
         this.openai = new OpenAI({apiKey});
@@ -26,7 +28,7 @@ Na resposta não deve conter:
             messages: [
                 {
                     role: "user",
-                    content: this.PROMPT,
+                    content: OpenaiService.EXTRACT_CONTENT_PROMPT,
                 },
                 {
                     role: "user",
@@ -44,7 +46,7 @@ Na resposta não deve conter:
             model: "gpt-4-vision-preview",
         });
 
-        return chatCompletion.choices[0].message.content
+        return chatCompletion.choices[0].message.content;
     }
 
 
@@ -53,7 +55,7 @@ Na resposta não deve conter:
             messages: [
                 {
                     role: "user",
-                    content: this.PROMPT,
+                    content: OpenaiService.EXTRACT_CONTENT_PROMPT,
                 },
                 {
                     role: "user",
@@ -73,4 +75,33 @@ Na resposta não deve conter:
 
         return chatCompletion.choices[0].message.content
     }
+
+    async generateStorytelling(username: string, userAge: number, imageContent: string) {
+        const prompt = `Explique esse trecho usando storytelling 
+        de uma forma que um adolescente de ${userAge} anos consiga entender, inclua todas as informações
+        e detalhes do trecho, mas não seja longo, use a quantidade necessária para transmitir todas as informações, 
+        não omita termos importantes para a matéria do trecho:
+        ${imageContent}`
+
+        const chatCompletion = await this.openai.chat.completions.create({
+            messages: [
+                {
+                    role: "user",
+                    content: prompt,
+                }
+            ],
+            model: "gpt-3.5-turbo",
+        });
+
+        const response = chatCompletion.choices[0].message.content
+
+        await this.contentService.save({
+            username,
+            prompt,
+            text: response
+        })
+
+        return response;
+    }
+
 }
