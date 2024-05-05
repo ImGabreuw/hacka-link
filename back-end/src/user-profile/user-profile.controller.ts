@@ -6,7 +6,7 @@ import {
     HttpStatus,
     NotFoundException,
     Param,
-    Post,
+    Post, Query,
     Res
 } from '@nestjs/common';
 import {UserProfileService} from './user-profile.service';
@@ -30,7 +30,7 @@ export class UserProfileController {
     }
 
     @Get()
-    async findByUsername(@Res() response: Response, @Param() username: string) {
+    async findByUsername(@Res() response: Response, @Query() username: string) {
         const userProfile = await this.userProfileService.findByUsername(username);
 
         if (userProfile == null) {
