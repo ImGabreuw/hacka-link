@@ -30,25 +30,37 @@ const CONTENT_STYLES = [
 
 const DISABILITIES = ["TDAH", "Dislexia", "Auditivo", "TEA"];
 
-const onboardingSubmit = async (username, learningMethod, contentStyle) => {
+const onboardingSubmit = async (
+  username,
+  learningMethod,
+  contentStyleTitle,
+  contentStyleDescription
+) => {
   let payload = {
     username,
     learningMethod,
-    contentStyleTitle: contentStyle.title,
-    contentStyleDescription: contentStyle.description,
+    contentStyleTitle,
+    contentStyleDescription,
+    age: 15,
   };
 
-  const response = await axios.post(
-    "http://localhost:3000/user-profile",
-    payload
-  );
-  console.log("@data", response.data);
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/user-profile",
+      payload
+    );
+    console.log("@data", response.data);
+  } catch (e) {
+    console.log(JSON.stringify(e));
+  }
 };
 
 function Onboarding() {
   const [selectedLearningMethod, setSelectedLearningMethod] = useState("");
   const [selectedContentStyle, setSelectedContentStyle] = useState("");
   // const [selectedDisabilities, setSelectedDisabilities] = useState([]);
+
+  const [userData, setUserData] = useState(null);
 
   const [step, setStep] = useState(1);
 
@@ -58,6 +70,29 @@ function Onboarding() {
   useEffect(() => {
     if (!loading && !user) return navigate("/");
   }, [user, loading]);
+
+  useEffect(
+    () => {
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(
+            "http://localhost:3000/user-profile",
+            {
+              params: { username: user.displayName },
+            }
+          );
+
+          console.log("@Response", response);
+          setUserData(response.data);
+          navigate("/onboarding");
+        } catch (e) {}
+      };
+
+      fetchUserData();
+    },
+    userData,
+    setUserData
+  );
 
   const renderLearningMethods = () => (
     <div className="">
@@ -72,7 +107,8 @@ function Onboarding() {
 
   const renderButtonMethod = (method) => (
     <button
-      className="bg-purple-300 p-4 rounded-md my-2"
+      style={{ backgroundColor: "#FEBE5B" }}
+      className="rounded-full px-10 py-4 text-white mb-4"
       onClick={() => {
         setSelectedLearningMethod(method);
         setStep(step + 1);
@@ -95,19 +131,21 @@ function Onboarding() {
 
   const renderButtonContentStyle = (contentStyle) => (
     <div
-      className="bg-purple-300 p-4 rounded-md my-2"
-      onClick={() => {
+      style={{ backgroundColor: "#FEBE5B" }}
+      className="p-4 rounded-md my-2"
+      onClick={async () => {
         setSelectedContentStyle(contentStyle.title);
         setStep(step + 1);
-        onboardingSubmit(
+        await onboardingSubmit(
           user.displayName,
           selectedLearningMethod,
-          selectedContentStyle
+          contentStyle.description,
+          contentStyle.title
         );
-        navigate("/");
+        // navigate("/");
       }}
     >
-      <h3>{contentStyle.title}</h3>
+      <h3 className="text-white">{contentStyle.title}</h3>
       <p>{contentStyle.description}</p>
     </div>
   );
@@ -144,13 +182,27 @@ function Onboarding() {
       // case 3:
       //     return renderDisabilities();
       default:
-        return <div>fim</div>;
+        return (
+          <div>
+            <button
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              {" "}
+              Retornar à tela inicial{" "}
+            </button>
+          </div>
+        );
     }
   };
 
   return (
-    <div className="w-100 px-4">
-      <div className="flex-row"> Explica aí </div>
+    <div className="container justify-center text-center">
+      <div className="flex justify-center">
+        <img className="w-64" src="./explica-ai-logo.png"></img>
+      </div>
+
       <div className="shadow-lg mt-48 flex-row rounded-md p-2">
         {renderSteps()}
       </div>
