@@ -1,8 +1,9 @@
 import {Body, Controller, Post} from '@nestjs/common';
 import {GenContentService} from "./gen-content.service";
-import {GenerateContentDto} from "./dto/generate-content.dto";
+import {ImageContentGenerationDto} from "./dto/image-content-generation.dto";
+import {TextContentGenerationDto} from "./dto/text-content-generation.dto";
 
-@Controller('content')
+@Controller('generation')
 export class GenContentController {
 
     constructor(
@@ -10,9 +11,14 @@ export class GenContentController {
     ) {
     }
 
-    @Post("generation")
-    async generation(@Body() generateContentDto: GenerateContentDto) {
-        return this.genContentService.generation(generateContentDto);
+    @Post("image")
+    async image_generation(@Body() imageContentGenerationDto: ImageContentGenerationDto) {
+        return await this.genContentService.image_generation(imageContentGenerationDto);
+    }
+
+    @Post("text")
+    async text_generation(@Body() textContentGenerationDto: TextContentGenerationDto) {
+        return await this.genContentService.text_generation(textContentGenerationDto)
     }
 
 }

@@ -1,4 +1,4 @@
-export class GenerateContentDto {
+export class ImageContentGenerationDto {
     username: string
     imageEncoded: string
 }

@@ -76,12 +76,16 @@ Na resposta não deve conter:
         return chatCompletion.choices[0].message.content
     }
 
-    async generateStorytelling(username: string, userAge: number, imageContent: string) {
+    async generateStorytelling(username: string, userAge: number, content: string) {
+        if (!content) {
+            return null;
+        }
+
         const prompt = `Explique esse trecho usando storytelling 
         de uma forma que um adolescente de ${userAge} anos consiga entender, inclua todas as informações
         e detalhes do trecho, mas não seja longo, use a quantidade necessária para transmitir todas as informações, 
         não omita termos importantes para a matéria do trecho:
-        ${imageContent}`
+        ${content}`
 
         const chatCompletion = await this.openai.chat.completions.create({
             messages: [
