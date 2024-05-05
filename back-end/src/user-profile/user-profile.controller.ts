@@ -1,6 +1,5 @@
-import {Body, Controller, Get, Post} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post} from '@nestjs/common';
 import {UserProfileService} from './user-profile.service';
-import {FindUserProfileDto} from "./dto/find-user-profile.dto";
 import {CreateUserProfileDto} from "./dto/create-user-profile.dto";
 
 @Controller('user-profile')
@@ -14,7 +13,7 @@ export class UserProfileController {
     }
 
     @Get()
-    async findByUsername(@Body() {username}: FindUserProfileDto) {
+    async findByUsername(@Param('username') username: string) {
         return await this.userProfileService.findByUsername(username);
     }
 }
