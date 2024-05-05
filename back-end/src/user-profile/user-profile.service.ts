@@ -12,7 +12,7 @@ export class UserProfileService {
     ) {
     }
 
-    async create({username, age, learningMethod, contentStyleTitle, contentStyleDescription}: CreateUserProfileDto) {
+    async create({username, age, learningMethod, contentStyleTitle, contentStyleDescription}: CreateUserProfileDto) : Promise<string | null> {
         const userProfile = await this.findByUsername(username);
 
         if (userProfile) {
