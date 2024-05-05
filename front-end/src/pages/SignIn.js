@@ -1,52 +1,73 @@
-import React from "react";
-
-const LEARNING_METHODS = [
-  "Aprendo vendo - Visual",
-  "Aprendo ouvindo - Auditivo",
-  "Aprendo fazendo - Cinestésico",
-];
-
-const CONTENT_STYLEs = [
-  {
-    title: "Storytelling",
-    description:
-      "Narração de histórias para transmitir uma mensagem, envolvendo personagens, enredo e emoções",
-  },
-  {
-    title: "Mindmap",
-    description:
-      "Diagrama que organiza informações visualmente, utilizando palavras-chave, cores e conexões para apresentar ideias.",
-  },
-  {
-    title: "Spaced Repetition",
-    description:
-      "Técnica de revisão espaçada ao longo do tempo, baseada no princípio de que a revisão regular melhora a retenção.",
-  },
-];
-
-const DISABILITIES = ["TDAH", "Dislexia", "Auditivo", "TEA"];
-
-const renderLearningMethods = () => (
-  <div>
-    <h2 className="text-lg mb-12">
-      De que forma você acha que aprende melhor?
-    </h2>
-    {LEARNING_METHODS.map((method) => (
-      <div>{method}</div>
-    ))}
-  </div>
-);
-
-const renderButtonMethod = () => (
-    <div></div>
-);
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {
+  auth,
+  logInWithEmailAndPassword,
+  signInWithGooglePopup,
+} from "../firebase.utils";
+import { userAdded } from "../store/onboardingSlice";
+import { useDispatch } from "react-redux";
 
 function SignIn() {
+  const dispatch = useDispatch();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [user, loading, error] = useAuthState(auth);
+  const navigate = useNavigate();
+  useEffect(() => {
+    // if (loading) {
+    //   // maybe trigger a loading screen
+    //   return;
+    // }
+    if (user) navigate("/home");
+  }, [user, loading]);
+
+  const logGoogleUser = async () => {
+    const response = await signInWithGooglePopup();
+    console.log(response);
+
+    dispatch(userAdded(response));
+    navigate("/");
+  };
+
   return (
-    <div className="w-100 px-4">
-      <div className="flex-row"> header</div>
-      <div className="shadow-lg mt-48 flex-row rounded-md p-2">
-        {renderLearningMethods()}
+    <div className="container justify-center text-center">
+      <h1 className="my-12">Entrar</h1>
+      <div className="flex-row mb-8">
+        <label htmlFor="username-input">Usuário:</label>
+        <input
+          className="p-2"
+          id="username-input"
+          type="text"
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
+
+      <div className="flex-row mb-8">
+        <label htmlFor="password-input">Senha:</label>
+        <input
+          className="p-2"
+          id="password-input"
+          type="password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      <div className="flex-row mb-8">
+        <button
+          onClick={async () => {
+            await logInWithEmailAndPassword(username, password);
+            navigate("/");
+          }}
+        >
+          Entrar com e-mail
+        </button>
+      </div>
+
+      <div className="flex-row mb-8">
+        <button onClick={() => logGoogleUser()}>Entrar com Google</button>
       </div>
     </div>
   );
