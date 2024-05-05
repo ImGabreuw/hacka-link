@@ -76,7 +76,7 @@ Na resposta não deve conter:
         return chatCompletion.choices[0].message.content
     }
 
-    async generateStorytelling(username: string, userAge: number, content: string) {
+    async generateStorytelling(username: string, userAge: number, content: string) : Promise<string | null> {
         if (!content) {
             return null;
         }

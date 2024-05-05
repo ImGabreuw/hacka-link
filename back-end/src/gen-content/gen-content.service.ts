@@ -13,26 +13,24 @@ export class GenContentService {
     }
 
     async image_generation({ username, imageEncoded }: ImageContentGenerationDto
-    ) {
+    ) : Promise<string | null> {
         const userProfile = await this.userProfileService.findByUsername(username)
 
         if (!userProfile) {
             return null;
         }
 
-        const content = await this.openiaService.getEncodedImageContent(imageEncoded);
-        return await this.openiaService.generateStorytelling(username, userProfile.age, content)
+        return await this.openiaService.generateStorytelling(username, userProfile.age, imageEncoded)
     }
 
     async text_generation({username, text }: TextContentGenerationDto
-    ) {
+    ) : Promise<string | null> {
         const userProfile = await this.userProfileService.findByUsername(username)
 
         if (!userProfile) {
             return null;
         }
 
-        const content = await this.openiaService.generateStorytelling(username, userProfile.age, text);
-        return await this.openiaService.generateStorytelling(username, userProfile.age, content)
+        return await this.openiaService.generateStorytelling(username, userProfile.age, text)
     }
 }
